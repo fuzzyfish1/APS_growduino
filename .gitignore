@@ -1,1 +1,6 @@
-Inventor/OldVersions/
+**/Inventor/OldVersions/
+**/.pio
+**/.vscode
+**/.DS_Store
+**/.Idea/
+**/.idea/
