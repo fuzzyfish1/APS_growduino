@@ -143,6 +143,7 @@ void waterPlant(const int& pumpPin, const int& wateringPwr, const int& wateringT
 	for (long start = millis(); millis() - start < wateringTime;) {
 
 		digitalWrite(LED_BUILTIN, millis() % (del*2) > del);
+		// you could do an experiment with the LED to show how this works
 		analogWrite(pumpPin, wateringPwr);
 
 	}
