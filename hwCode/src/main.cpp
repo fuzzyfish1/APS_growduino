@@ -80,6 +80,11 @@ void setup() {
  */
 unsigned long soilPercent(const float& soilResistance) {
 	// step 2: give values for DRY RESIST and WET RESIST in ohms, keep the UL at the end pls
+
+	// I went with dry soil reading first, labeled that 0%
+	// I then went with a slightly watered soil reading and called it 40%
+	// this is not the conventional tuning method which is in water, in air, but you can do that as well
+	// I had better luck with this because 35% is the dryness where it decides to water the plant
 	const unsigned long DRYRESIST = 4000UL;
 	const unsigned long WETRESIST = 2700UL;
 	const unsigned long percentage = map(soilResistance, DRYRESIST, WETRESIST, 0UL, 40UL);
@@ -182,10 +187,12 @@ void loop() {
 	const float soilResistance = resistorDivCalc(avgReading(RSTV_MSTR_PIN));
 	// step 2: read the resistance of wet and dry soil to calibrate soilPercent
 	const float soilMoisture = soilPercent(soilResistance);
+	// step3: calibrate soilMoisture, I tuned to the value of 35% after an extremely light watering
 
 	if (!IS_VALID(t) || !IS_VALID(h) || !IS_VALID(soilResistance)) {
 		// error protection code, dw about this :)
-		// Serial.println("if this happens often, then call an instructor to repair a wiring issue");
+		// if your code isn't printing anything / executing below,
+		// you should add debug prints here and check wiring
 		return;
 	}
 
@@ -205,7 +212,7 @@ void loop() {
 	}
 
 	static unsigned long lastWatering = 0UL;
-	constexpr unsigned long WATERING_PERIOD = (1UL * 60UL * 60UL * 1000UL); // every 1 hour in ms
+	constexpr unsigned long WATERING_PERIOD = (1UL * 60UL * 60UL * 1000UL); // every 1 hour in ms, btw the UL is necessary to avoid overflow
 	const unsigned long WATERING_TIME = 500UL; // water for .5 seconds, it helps to set this to 2 just to prime it
 
 	// if it wasn't watered before, water anyway
