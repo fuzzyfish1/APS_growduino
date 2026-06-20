@@ -1,3 +1,4 @@
+Ignore this for now
 look at the comments in main.cpp for information on this project
 
 teaching this over as long of a period as possible and planting the plant first, so the plant has time to sprout
