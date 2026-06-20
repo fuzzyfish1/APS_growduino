@@ -10,18 +10,7 @@
  *		- Measures soil moisture with a resistive soil moisture probe
  *		- uses the following information to water the plant
  *
- * TODO: Tadgh Exercise for the kids
- *		explain that floats are decimal points written in binary
- *		have kids encode 32 bit IEEE floats manually, to understand INF, NAN, and decimals
- *		hopefully this will prep the kids to understand why the library uses NaN for errors
- *
- * TODO: Tadgh explain RH scale and add to slides
- *		for a specific temperature,
- *		maximum amount of water air can hold is called the dew point (extra water in the air will condensate)
- *		RH is the percentage of water in the air, more than 100% water begins to condensate
- *		RH = mass water in air / mass water that can be in the air
- *
- *	TODO: Tadgh explain Ohms Law
+ * TODO: Tadgh explain Ohms Law
  *		something to explain ohms law
  *		electrons are in a super position of moving everywhere at once at 0V
  *		applying a voltage shifts the electron waveform to move towards electron holes
@@ -29,6 +18,16 @@
  *		they create electron interference waveforms (think the double slit experiment) and
  *		the finite barrier problem (https://qm1.quantumtinkerer.tudelft.nl/8_finite-barrier/)
  *		some electrons are reflected backwards, which creates resistance, V = IR
+ *
+ * TODO: Tadgh explain resistor dividers
+ *		have the kids go to https://ohmslawcalculator.com/voltage-divider-calculator
+ *		derive the resistor divider equation and explain how the resistance is measured
+ *
+ * TODO: Tadgh explain RH scale and add to slides
+ *		for a specific temperature,
+ *		maximum amount of water air can hold is called the dew point (extra water in the air will condensate)
+ *		RH is the percentage of water in the air, more than 100% water begins to condensate
+ *		RH = mass water in air / mass water that can be in the air
  *
  *
  * Docs + links:
@@ -39,7 +38,6 @@
  * https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/5696671 << calculating water lost by TH sensors, pure IOT approach
  * https://pmc.ncbi.nlm.nih.gov/articles/PMC8237332/ << ML approach to the project
  * https://iwaponline.com/jh/article/26/12/3224/106261/Development-of-a-smart-irrigation-monitoring << edge compute approach
- *
  *
  * TODO: GARDUINO FORM FACTOR EXPANSION AND TURN INTO BULBASAUR
  *		 PHOTODIODE AND NEOPIXEL EXPANSION
@@ -115,7 +113,7 @@ unsigned long avgReading(const int& pinNum) {
 float resistorDivCalc(const unsigned long& reading) {
 
 	const float R1 = 10000.f; // 10K ohm resistor that we are using
-	const float Vin = 5.f; // voltage level of the resistor divider
+	const float Vin = 5.f; // voltage input level of the resistor divider
 	const float Vout = reading * (Vin / 1023.f); // 1023 is the max value that can come out of the ADC
 	const float R2 = R1 * (Vin / Vout - 1); // the calculated unknown resistance
 
@@ -139,7 +137,6 @@ void waterPlant(const int& pumpPin, const int& wateringPwr, const int& wateringT
 
 	for (long start = millis(); millis() - start < wateringTime;) {
 
-		// Serial.print(".");
 		digitalWrite(LED_BUILTIN, millis() % (del*2) > del);
 		analogWrite(pumpPin, wateringPwr);
 
@@ -154,7 +151,7 @@ void waterPlant(const int& pumpPin, const int& wateringPwr, const int& wateringT
  * @return adjusted watering threshold constrained between 20 and 60
  */
 unsigned long adjustedWateringThreshold(const float& tempC, const float& humidity) {
-	int t = 35; // links show that 35% watering threshold looks like some kind of minimum
+	int t = 35; // you should water the plant as little as possible and use that to tune this
 
 	// btw these numbers are entirely arbitrary
 	if (tempC > 28) {
@@ -207,10 +204,13 @@ void loop() {
 		lastPrint = millis();
 	}
 
-	static unsigned long lastWatering = 0;
-	const unsigned long WATERING_PERIOD = (1UL * 60UL * 60UL * 1000UL); // every 3 hours in ms
-	const unsigned long WATERING_TIME = 500; // water for .5 seconds, it helps to set this to 2 just to prime it
+	static unsigned long lastWatering = 0UL;
+	constexpr unsigned long WATERING_PERIOD = (1UL * 60UL * 60UL * 1000UL); // every 1 hour in ms
+	const unsigned long WATERING_TIME = 500UL; // water for .5 seconds, it helps to set this to 2 just to prime it
 
+	// if it wasn't watered before, water anyway
+	// or if the time elapsed since last water is more than the watering period
+	// and the soil is below the watering threshold
 	if (!lastWatering || (millis() - lastWatering > WATERING_PERIOD && soilMoisture <= adjustedWateringThreshold(t,h))) {
 		waterPlant(PWM_PIN, WATERING_PWR, WATERING_TIME);
 
