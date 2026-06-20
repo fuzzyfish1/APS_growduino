@@ -85,9 +85,9 @@ unsigned long soilPercent(const float& soilResistance) {
 	// I then went with a slightly watered soil reading and called it 40%
 	// this is not the conventional tuning method which is in water, in air, but you can do that as well
 	// I had better luck with this because 35% is the dryness where it decides to water the plant
-	const unsigned long DRYRESIST = 4000UL;
-	const unsigned long WETRESIST = 2700UL;
-	const unsigned long percentage = map(soilResistance, DRYRESIST, WETRESIST, 0UL, 40UL);
+	const unsigned long DRYRESIST = ;
+	const unsigned long WETRESIST = ;
+	const unsigned long percentage = ;
 	return max(0UL, min(percentage, 100UL));
 }
 
@@ -99,7 +99,7 @@ unsigned long soilPercent(const float& soilResistance) {
 unsigned long avgReading(const int& pinNum) {
 
 	const unsigned long NUM_READINGS = 256UL;
-	// pick any power of 2 for fast division later
+	// pick any power of 2 for fast computer division
 
 	unsigned long sum = 0;
 	for (int i = 0; i < NUM_READINGS; i++) {
@@ -116,11 +116,11 @@ unsigned long avgReading(const int& pinNum) {
  * @return The calculated resistance of the second resistor (R2) in ohms.
  */
 float resistorDivCalc(const unsigned long& reading) {
-
-	const float R1 = 10000.f; // 10K ohm resistor that we are using
-	const float Vin = 5.f; // voltage input level of the resistor divider
-	const float Vout = reading * (Vin / 1023.f); // 1023 is the max value that can come out of the ADC
-	const float R2 = R1 * (Vin / Vout - 1); // the calculated unknown resistance
+	// fill in the equations and values here
+	const float R1 = ; // 10K ohm resistor that we are using
+	const float Vin = ; // voltage input level of the resistor divider
+	const float Vout = ; // 1023 is the max value that can come out of the ADC
+	const float R2 = ; // the calculated unknown resistance
 
 	return R2;
 }
@@ -140,14 +140,15 @@ void waterPlant(const int& pumpPin, const int& wateringPwr, const int& wateringT
 
 	Serial.println("SLURP SLURP");
 
+	// fill in the PWM functions
 	for (long start = millis(); millis() - start < wateringTime;) {
 
 		digitalWrite(LED_BUILTIN, millis() % (del*2) > del);
 		// you could do an experiment with the LED to show how this works
-		analogWrite(pumpPin, wateringPwr);
+		
 
 	}
-	analogWrite(pumpPin, 0);
+	
 }
 
 /**
@@ -178,8 +179,8 @@ unsigned long adjustedWateringThreshold(const float& tempC, const float& humidit
 void loop() {
 
 	// step 1: read the sensor, and see it's output before and after you breath on it
-	const float t = dht.readTemperature();
-	const float h = dht.readHumidity();
+	const float t = ;
+	const float h = ;
 
 	// soil moisture is constantly active, which is bad for it but this is intentional
 	// PLA can trap moisture in infill as well as decay. The kit doesn't last too long hopefully
@@ -219,7 +220,9 @@ void loop() {
 	// if it wasn't watered before, water anyway
 	// or if the time elapsed since last water is more than the watering period
 	// and the soil is below the watering threshold
-	if (!lastWatering || (millis() - lastWatering > WATERING_PERIOD && soilMoisture <= adjustedWateringThreshold(t,h))) {
+
+	// repair the if statement
+	if (!lastWatering || ) {
 		waterPlant(PWM_PIN, WATERING_PWR, WATERING_TIME);
 
 		lastWatering = millis();
